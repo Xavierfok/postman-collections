@@ -1,0 +1,1053 @@
+{
+  "info": {
+    "_postman_id": "983e5a1a-1667-50bd-841f-7411e6d0f9a9",
+    "name": "Singapore Mobile Proxy - Customer API",
+    "description": "Customer API for [Singapore Mobile Proxy](https://singaporemobileproxy.com/?utm_source=postman&utm_medium=collection): dedicated 4G/5G proxies on real Singapore SIMs (Singtel or M1).\n\n**Auth:** create a key in the [client dashboard](https://singaporemobileproxy.com/client?utm_source=postman&utm_medium=collection), then set `apiKey` in the environment. It goes in the `x-api-key` header (set at collection level).\n\n**Base URL:** `https://singaporemobileproxy.com/api/v1`. POST bodies can be JSON or form-encoded.\n\n**Errors** are JSON: `{\"detail\": {\"message\": \"...\"}}`. 400 bad parameter, 401 bad key, 402 payment needed, 403 reseller key (use the reseller collection), 404 not found, 429 rate limited (60 requests a minute, 5 purchases an hour, 5 minutes between rotations or reboots of a proxy).\n\n**Reseller accounts** use the separate *Singapore Mobile Proxy - Reseller API* collection; reseller keys are refused here.\n\nHuman docs: https://singaporemobileproxy.com/api-docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('response is JSON', function () {",
+          "    pm.response.to.have.jsonBody();",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://singaporemobileproxy.com/api/v1",
+      "type": "string",
+      "description": "API root"
+    },
+    {
+      "key": "licenseUuid",
+      "value": "",
+      "type": "string",
+      "description": "A license uuid from GET /proxies/my"
+    }
+  ],
+  "item": [
+    {
+      "name": "Account & plans",
+      "description": "Read-only. Safe to call at any time.",
+      "item": [
+        {
+          "id": "d034ce20-9072-52f2-a9f2-c5c51a0e960d",
+          "name": "List my proxies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/proxies/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxies",
+                "my"
+              ]
+            },
+            "description": "Every proxy on your account with its connection details, bandwidth used and expiry. `uuid` is the license id the other endpoints take."
+          },
+          "response": [
+            {
+              "id": "4a30dad0-f496-5623-a132-f7dc4df0b81e",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/proxies/my",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxies",
+                    "my"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"proxyList\": [\n    {\n      \"uuid\": \"db4474ea-5f1e-4c2b-9a7d-3e8f6b2a1c90\",\n      \"license_status\": \"ACTIVE\",\n      \"package_name\": \"200GB Plan\",\n      \"host_domain\": \"sg.veerlane.com\",\n      \"http_port\": 8101,\n      \"socket_port\": 5101,\n      \"start_date\": \"2026-09-01T00:00:00+00:00\",\n      \"expired_date\": \"2026-10-01T00:00:00+00:00\",\n      \"m_type\": \"PROXYSMART\",\n      \"status\": \"CONNECTED\",\n      \"rotation_link\": \"https://singaporemobileproxy.com/api/v1/proxy/change-ip?license=db4474ea-5f1e-4c2b-9a7d-3e8f6b2a1c90\",\n      \"min_time_change_ip\": 5,\n      \"authentication_user\": \"user8101:pass8101\",\n      \"authorization_ips\": \"\",\n      \"dl_bytes\": \"0\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 45.2,\n      \"auto_extend\": false\n    }\n  ]\n}"
+            },
+            {
+              "id": "fffde8e5-1578-540f-ae9e-ac2cff68c6c2",
+              "name": "401 missing or invalid key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/proxies/my",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxies",
+                    "my"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"API key is invalid.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "87173e56-5340-5fdb-9098-cbb1ba4d2897",
+          "name": "List plans and stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/proxies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxies"
+              ]
+            },
+            "description": "Plans you can buy, per location, with prices for each `planType` and the number of free modems (`proxy_count`). Pass one of these `bandwidth_gb` values to a purchase."
+          },
+          "response": [
+            {
+              "id": "835a1549-07fa-581e-b3f7-e8d1cf9f6718",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/proxies",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxies"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"proxies\": [\n    {\n      \"country\": \"Singapore\",\n      \"city\": \"Singapore\",\n      \"isp\": \"Mobile\",\n      \"type\": \"PROXYSMART\",\n      \"proxy_count\": 10,\n      \"plans\": [\n        {\n          \"bandwidth_gb\": 200,\n          \"price_usd\": 4.0,\n          \"planType\": \"DAY\"\n        },\n        {\n          \"bandwidth_gb\": 200,\n          \"price_usd\": 13.33,\n          \"planType\": \"WEEK\"\n        },\n        {\n          \"bandwidth_gb\": 200,\n          \"price_usd\": 40.0,\n          \"planType\": \"MONTH\"\n        },\n        {\n          \"bandwidth_gb\": 500,\n          \"price_usd\": 5.0,\n          \"planType\": \"DAY\"\n        },\n        {\n          \"bandwidth_gb\": 500,\n          \"price_usd\": 16.67,\n          \"planType\": \"WEEK\"\n        },\n        {\n          \"bandwidth_gb\": 500,\n          \"price_usd\": 50.0,\n          \"planType\": \"MONTH\"\n        },\n        {\n          \"bandwidth_gb\": 1000,\n          \"price_usd\": 8.5,\n          \"planType\": \"DAY\"\n        },\n        {\n          \"bandwidth_gb\": 1000,\n          \"price_usd\": 28.33,\n          \"planType\": \"WEEK\"\n        },\n        {\n          \"bandwidth_gb\": 1000,\n          \"price_usd\": 85.0,\n          \"planType\": \"MONTH\"\n        }\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "id": "b95cacac-88a4-5cc2-b845-e9eb4dd40685",
+          "name": "Get credit balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/account/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account",
+                "balance"
+              ]
+            },
+            "description": "Account credit and the 20 most recent credit transactions."
+          },
+          "response": [
+            {
+              "id": "bd8d1dfe-c8a9-54c1-9c4f-3727fb9f208b",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/account/balance",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "account",
+                    "balance"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"credits\": 15.0,\n  \"transactions\": [\n    {\n      \"id\": \"7c1d0f7e-...\",\n      \"amount\": 15.0,\n      \"balance_after\": 15.0,\n      \"type\": \"promotion\",\n      \"description\": \"welcome bonus\",\n      \"created_at\": \"2026-09-20T10:00:00+00:00\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Buy & renew (charges money)",
+      "description": "**These spend money.** Credits are applied first; the rest is charged to the card saved on your account. Nothing here asks for confirmation. Limit: 5 purchases an hour.",
+      "item": [
+        {
+          "id": "206dd857-d77e-5dd2-a890-fecb8e7a359d",
+          "name": "Buy a proxy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "purchase"
+              ]
+            },
+            "description": "Buys new proxies. **Charges immediately.**\n\n- `country`, `city`, `isp` (required): use the values `GET /proxies` returns (`Singapore`, `Singapore`, `Mobile`).\n- `planType` (required): `DAY`, `WEEK` or `MONTH`.\n- `bandwidth_gb`: one of the tiers `GET /proxies` lists (200, 500, 1000). Default: the cheapest.\n- `quantity`: default 1.\n- `username` (`user:pass`, letters and digits) **or** `ipAddress` (IP whitelist), not both.\n- `couponCode`: optional.\n\nIf some units can't be provisioned, the response says how many were created and refunds the rest to account credit.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country\": \"Singapore\",\n  \"city\": \"Singapore\",\n  \"isp\": \"Mobile\",\n  \"planType\": \"DAY\",\n  \"bandwidth_gb\": 200,\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "77dcd68e-99ba-5856-9abf-5558c4b90f87",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/purchase",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "purchase"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"country\": \"Singapore\",\n  \"city\": \"Singapore\",\n  \"isp\": \"Mobile\",\n  \"planType\": \"DAY\",\n  \"bandwidth_gb\": 200,\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\",\n  \"proxies\": [\n    {\n      \"license_uuid\": \"db4474ea-5f1e-4c2b-9a7d-3e8f6b2a1c90\",\n      \"package_name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200,\n      \"start_date\": \"2026-09-23T10:00:00+00:00\",\n      \"expired_date\": \"2026-09-24T10:00:00+00:00\",\n      \"format_http\": \"sg.veerlane.com:8101:user8101:pass8101\",\n      \"format_sock\": \"sg.veerlane.com:5101:user8101:pass8101\",\n      \"link_change_ip\": \"https://singaporemobileproxy.com/api/v1/proxy/change-ip?license=db4474ea-5f1e-4c2b-9a7d-3e8f6b2a1c90\"\n    }\n  ]\n}"
+            },
+            {
+              "id": "bdf544bd-85c1-5226-becd-dd5fbfa4607e",
+              "name": "402 no card on file",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/purchase",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "purchase"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"country\": \"Singapore\",\n  \"city\": \"Singapore\",\n  \"isp\": \"Mobile\",\n  \"planType\": \"DAY\",\n  \"bandwidth_gb\": 200,\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Payment Required",
+              "code": 402,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"No payment method on file. Please add a card via the web dashboard.\"\n  }\n}"
+            },
+            {
+              "id": "79f6630a-d468-500d-8a37-59c7146078de",
+              "name": "404 no free modem",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/purchase",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "purchase"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"country\": \"Singapore\",\n  \"city\": \"Singapore\",\n  \"isp\": \"Mobile\",\n  \"planType\": \"DAY\",\n  \"bandwidth_gb\": 200,\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"There is no available proxy.\",\n    \"refunded_usd\": 4.0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "11f7c3b5-82a6-5785-9c57-c0f1304abcad",
+          "name": "Renew a proxy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/license/extendproxy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "license",
+                "extendproxy"
+              ]
+            },
+            "description": "Adds one `time_unit` (`DAY`, `WEEK` or `MONTH`) to an active license. **Charges immediately.**",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"time_unit\": \"MONTH\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "94fa2581-3311-5955-9007-8cbe0d769892",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/license/extendproxy",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "license",
+                    "extendproxy"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"time_unit\": \"MONTH\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\",\n  \"balance\": 0.0,\n  \"proxy\": {\n    \"modem_name\": \"200GB Plan\",\n    \"host_domain\": \"sg.veerlane.com\",\n    \"http_port\": 8101,\n    \"socket_port\": 5101,\n    \"authentication_user\": \"user8101:pass8101\",\n    \"authorization_ips\": null,\n    \"start_date\": \"2026-09-01T00:00:00+00:00\",\n    \"expired_date\": \"2026-10-31T00:00:00+00:00\",\n    \"status\": \"ACTIVE\",\n    \"uuid\": \"db4474ea-5f1e-4c2b-9a7d-3e8f6b2a1c90\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "bc03f53d-f5e6-5742-b987-d84cf46b0aca",
+          "name": "Turn auto-renew on or off",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/license/autoextend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "license",
+                "autoextend"
+              ]
+            },
+            "description": "`auto_extend`: `true` or `false`. Off by default. When on, the license renews from credit/card before it expires.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"auto_extend\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "bd02bf0b-54c6-5dc5-8808-55e3a5156e39",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/license/autoextend",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "license",
+                    "autoextend"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"auto_extend\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Auto-extend updated successfully.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Manage a proxy",
+      "description": "Controls for one proxy, identified by its license `uuid`.",
+      "item": [
+        {
+          "id": "31558453-59f4-5aad-a50a-0da2c0e8c42a",
+          "name": "Rotate IP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/change-ip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "change-ip"
+              ]
+            },
+            "description": "New IP on the same host and port. 5-minute cooldown per proxy (429 with the wait in seconds).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e6be3da9-616a-5069-bd08-2d603b0bc623",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/change-ip",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "change-ip"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\"\n}"
+            },
+            {
+              "id": "d2932531-76ac-5328-867e-03642dfe3105",
+              "name": "429 cooldown",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/change-ip",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "change-ip"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"Rate limit exceeded. Try again in 212 seconds.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "62f6505e-6fb1-5f2b-a9a2-37e2626076fa",
+          "name": "Rotate IP (rotation link)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/change-ip?license={{licenseUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "change-ip"
+              ],
+              "query": [
+                {
+                  "key": "license",
+                  "value": "{{licenseUuid}}",
+                  "description": "License uuid"
+                }
+              ]
+            },
+            "description": "The same rotation as a plain GET link, for tools that can only open a URL. Still needs the `x-api-key` header."
+          },
+          "response": [
+            {
+              "id": "449f0b25-9933-548a-8245-46ed6c5a6fa0",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/change-ip?license={{licenseUuid}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "change-ip"
+                  ],
+                  "query": [
+                    {
+                      "key": "license",
+                      "value": "{{licenseUuid}}",
+                      "description": "License uuid"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "176de029-610b-55f9-8ee5-2ca7f84463f0",
+          "name": "Reboot modem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/reboot",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "reboot"
+              ]
+            },
+            "description": "Power-cycles the modem behind the proxy. Back in about a minute. 5-minute cooldown.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "5856f42c-b33d-581f-a90b-a98d038bd9be",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/reboot",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "reboot"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Reboot Device Success.\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "65f6dbdc-e5e8-50a6-a5e8-3b5b336891dd",
+          "name": "Change authentication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/update-authentication",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "update-authentication"
+              ]
+            },
+            "description": "Send one of: `userName` as `user:pass` (letters and digits), or `ipAddress` (comma-separated IPs to whitelist).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"userName\": \"newuser:newpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "60649071-47f9-5052-b9c8-c1daee660417",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/update-authentication",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "update-authentication"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"userName\": \"newuser:newpass123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "4bc188db-842b-5ca0-9675-2117b881ef8e",
+          "name": "Set OS fingerprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/proxy/update-os",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "proxy",
+                "update-os"
+              ]
+            },
+            "description": "Passive OS fingerprint the proxy presents. `osType`: android:1, android:3, android:4, ios:1, ios:2, ios:3, macosx:3, macosx:4, macosx:5, windows:1, windows:4.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"osType\": \"windows:4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "2b61df36-94d5-5fb0-be61-f8ea5cf4952a",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/proxy/update-os",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "proxy",
+                    "update-os"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"osType\": \"windows:4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "83abcf65-5e36-56c6-8d17-d9a1d35d7364",
+          "name": "Set auto-rotation interval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/license/update-rotation-time",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "license",
+                "update-rotation-time"
+              ]
+            },
+            "description": "Rotate the IP on a timer. `minute`: whole number, 5 or more.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"minute\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "930b0069-aacf-515f-b6c5-3b64920fbad3",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/license/update-rotation-time",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "license",
+                    "update-rotation-time"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uuid\": \"{{licenseUuid}}\",\n  \"minute\": 30\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Success\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1385 @@
+{
+  "info": {
+    "_postman_id": "6babfc0f-112b-530a-bda4-f827b4ebe81a",
+    "name": "Singapore Mobile Proxy - Reseller API",
+    "description": "Reseller API for [Singapore Mobile Proxy](https://singaporemobileproxy.com/?utm_source=postman&utm_medium=collection): create and manage dedicated Singapore mobile proxies (Singtel or M1) for your own customers, at your reseller price.\n\n**Auth:** make a key in the reseller dashboard (`/shop/api-keys`), set `apiKey` in the environment. Sent as `x-api-key`. Customer keys are refused here, and reseller keys on the customer API.\n\n**Billing:** no deposit. Each port bills its daily cost against your monthly credit limit ($500 by default) and you're invoiced monthly.\n\n**Errors:** `{\"detail\": {\"message\": \"...\"}}`. 400 bad parameter, 401 bad key, 402 past your credit limit, 403 not a reseller key / account inactive, 404 no such port, 409 port cancelled, 429 too fast (120 requests a minute, 30 new ports an hour, 5 minutes between rotations or reboots of a port), 502 the proxy server refused (nothing changed), 503 no free modem (nothing created or billed).\n\nHuman docs: https://singaporemobileproxy.com/reseller-api-docs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('response is JSON', function () {",
+          "    pm.response.to.have.jsonBody();",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://singaporemobileproxy.com/api/reseller/v1",
+      "type": "string",
+      "description": "API root"
+    },
+    {
+      "key": "portId",
+      "value": "",
+      "type": "string",
+      "description": "A port id from GET /ports"
+    }
+  ],
+  "item": [
+    {
+      "name": "Account & plans",
+      "description": "Read-only.",
+      "item": [
+        {
+          "id": "fb3345ba-7528-5c5d-88db-e33c67ae85ce",
+          "name": "Account and credit position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "account"
+              ]
+            },
+            "description": "Your discount and where you stand against your monthly credit limit. A new port has to fit in `available_usd`, which already counts what your live ports will bill until month end."
+          },
+          "response": [
+            {
+              "id": "71a426e9-1ef8-5149-a50e-5b97583a965c",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "account"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"shop\": {\n    \"id\": \"fee89a06-...\",\n    \"name\": \"yourshop\"\n  },\n  \"discount_pct\": 30,\n  \"bonus_discount_pct\": 0,\n  \"credit_limit_usd\": 500.0,\n  \"spent_this_month_usd\": 12.4,\n  \"committed_to_month_end_usd\": 11.2,\n  \"available_usd\": 476.4,\n  \"live_ports\": 1,\n  \"remaining_days_this_month\": 12,\n  \"billing\": \"No deposit. Each port bills its daily cost against your credit limit, invoiced monthly.\"\n}"
+            },
+            {
+              "id": "50132eac-78d1-57bb-8e48-1f983d109c93",
+              "name": "401 missing or invalid key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "account"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"API key is invalid.\"\n  }\n}"
+            },
+            {
+              "id": "1aa593f4-4270-5253-bca1-1b3fb2170da7",
+              "name": "403 not a reseller key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "account"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This API is for reseller accounts. Customer API keys use /api/v1: https://singaporemobileproxy.com/api-docs\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "1be37da1-849d-5981-b348-2b1c14fdec06",
+          "name": "Plans and stock",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "plans"
+              ]
+            },
+            "description": "Tiers at your reseller price (monthly and daily) and free modems per telco (Singtel, M1)."
+          },
+          "response": [
+            {
+              "id": "1f24c037-c55f-5822-9f9e-727514d8cf21",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/plans",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "plans"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"plans\": [\n    {\n      \"plan_id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200,\n      \"monthly_usd\": 28.0,\n      \"daily_usd\": 0.9333\n    },\n    {\n      \"plan_id\": \"a8765dc1-...\",\n      \"name\": \"500GB Plan\",\n      \"bandwidth_gb\": 500,\n      \"monthly_usd\": 35.0,\n      \"daily_usd\": 1.1667\n    }\n  ],\n  \"stock\": {\n    \"singtel\": {\n      \"available\": 8,\n      \"label\": \"5+\"\n    },\n    \"m1\": {\n      \"available\": 3,\n      \"label\": \"3\"\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ports",
+      "description": "Create, list and remove ports. Ports bill their daily cost against your credit limit while they run and are invoiced monthly.",
+      "item": [
+        {
+          "id": "3f1a9158-90fe-5c41-8705-4219af0df774",
+          "name": "List ports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports?status=live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "live",
+                  "description": "live (default), cancelled or all"
+                }
+              ]
+            },
+            "description": "Your ports, newest first. Panel ports show here too."
+          },
+          "response": [
+            {
+              "id": "9762736b-4b63-59dc-a3f7-d5c03b4b6228",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports?status=live",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "live",
+                      "description": "live (default), cancelled or all"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "id": "5a4c6133-cd98-5e8d-9266-6e71bdff4892",
+          "name": "Get one port",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "One port, including cancelled ones."
+          },
+          "response": [
+            {
+              "id": "f3ece979-6f87-5f93-851d-ea07147fd8de",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            },
+            {
+              "id": "60fe4211-af0a-5c23-9ed3-0e71d398ec39",
+              "name": "404 not yours",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"No such port.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "411b986b-c912-555d-8c6a-0f191cec8c40",
+          "name": "Create ports (bills daily)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports"
+              ]
+            },
+            "description": "Creates ports on your credit line. **Starts billing** its daily cost from creation.\n\n- `bandwidth_gb` (200, 500 or 1000; default the cheapest) or `plan_id`\n- `quantity`: 1-10, default 1 (limit 30 new ports an hour)\n- `days`: 1-365 sets the end date; leave out to run until cancelled\n- `telco`: `singtel` or `m1` (optional)\n- `label`: up to 64 characters\n\nA port runs through its end date (Singapore time) and is removed at 00:05 SGT the next morning.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bandwidth_gb\": 500,\n  \"days\": 7,\n  \"telco\": \"singtel\",\n  \"label\": \"customer 42\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "25490780-fd84-524e-a543-188404f8e579",
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bandwidth_gb\": 500,\n  \"days\": 7,\n  \"telco\": \"singtel\",\n  \"label\": \"customer 42\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Created\",\n  \"requested\": 1,\n  \"created\": 1,\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null\n    }\n  ]\n}"
+            },
+            {
+              "id": "65efcfbf-4980-560d-b347-4fa2caee8a1f",
+              "name": "402 over credit limit",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bandwidth_gb\": 500,\n  \"days\": 7,\n  \"telco\": \"singtel\",\n  \"label\": \"customer 42\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Payment Required",
+              "code": 402,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"That goes past your $500.00 credit limit: 0 of 1 fit. Ask us to raise it.\",\n    \"available_usd\": 0.4\n  }\n}"
+            },
+            {
+              "id": "52114505-164d-54d6-8cc3-1a77d7567490",
+              "name": "503 no free modem",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bandwidth_gb\": 500,\n  \"days\": 7,\n  \"telco\": \"singtel\",\n  \"label\": \"customer 42\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"No free modem could take a port right now. Nothing was created or billed; try again shortly.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "ffc71c48-1d30-5422-b96a-0e3b82158f0b",
+          "name": "Cancel port (removes it now)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "cancel"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Removes the port now and stops its billing. The port is only marked cancelled once the proxy server confirms; otherwise you get a 502 and it stays live."
+          },
+          "response": [
+            {
+              "id": "a65d82de-72f4-53be-82d2-ea14f5c3ef34",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "cancel"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"cancelled\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": \"2026-09-24T09:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "7fd5b2a3-7b84-5e58-9f58-f127cdd4a159",
+          "name": "Set end date",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/end-date",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "end-date"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Send `date` (`YYYY-MM-DD`, tomorrow to 365 days out, or `null` to clear it) **or** `add_days` (1-365, added to the current end date, or to today if none).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"add_days\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1ce0e4f7-7920-5395-b04e-0dc4cba4a30b",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/end-date",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "end-date"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"add_days\": 30\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Manage a port",
+      "description": "Controls for one port.",
+      "item": [
+        {
+          "id": "a91f03d9-edf0-5ae4-b815-80ab8f461955",
+          "name": "Rotate IP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/rotate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "rotate"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "New IP. 5-minute cooldown per port. Your customer can also use the port's `rotation_link`."
+          },
+          "response": [
+            {
+              "id": "ad4db40a-bfb7-5639-a1f2-aa2f272bf175",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/rotate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "rotate"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Rotated\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "52ace3cc-c28e-5be6-aeba-3c685975ba0c",
+          "name": "Reboot modem",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/reboot",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "reboot"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "5-minute cooldown."
+          },
+          "response": [
+            {
+              "id": "520d7bb2-77a3-5a43-a2f6-f59d572f23a2",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/reboot",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "reboot"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Rebooting. The proxy is back in about a minute.\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "871b50e5-1af6-5df0-a2b4-315ac73fab21",
+          "name": "Swap modem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-modem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-modem"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Moves the port to another modem, e.g. when one is dead. Host, port and login stay the same. `telco` optional: `singtel` or `m1`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telco\": \"m1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e8dea686-9fc6-5321-a65c-f6ffe9beffc6",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-modem",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-modem"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"telco\": \"m1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "id": "d1cfdfbc-63eb-5047-914d-0cdcd46b128f",
+          "name": "Change proxy login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/credentials",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "credentials"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "`login` and `password`, both required, letters and digits only, up to 64 each.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"customer42\",\n  \"password\": \"s3cretPass\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "45b375d8-78ad-552c-a0b0-fce000677730",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/credentials",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "credentials"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"login\": \"customer42\",\n  \"password\": \"s3cretPass\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "id": "25f39982-ca92-57bf-bcf5-62628dc85add",
+          "name": "Change plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "plan"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "`bandwidth_gb` or `plan_id`. An upgrade has to fit your credit limit.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bandwidth_gb\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "52eeb555-37b1-527e-97e4-7713fbe8534e",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/plan",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "plan"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"bandwidth_gb\": 1000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "id": "eb916d75-c8e5-50b1-8681-164ac74fec2b",
+          "name": "Set label",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/label",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "label"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Empty string clears it.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"customer 42\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e0de5227-88c8-5443-8e1c-10ed8617b9fc",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/label",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "label"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"label\": \"customer 42\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        },
+        {
+          "id": "107f1354-6e74-5ee7-a16a-88637709724a",
+          "name": "Set OS fingerprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/os",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "os"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "`os_type`: none, android:1, android:3, android:4, ios:1, ios:2, ios:3, macosx:3, macosx:4, macosx:5, windows:1, windows:4.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"os_type\": \"windows:4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "df93bd58-b314-59a2-a5bd-0accc4a99a52",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/os",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "os"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"os_type\": \"windows:4\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message\": \"Updated\",\n  \"os_type\": \"windows:4\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "b33201de-3cb2-5ebb-b6b9-ee63a781708e",
+          "name": "Set auto-rotate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/auto-rotate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "auto-rotate"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "`minutes`: 0 turns it off, otherwise 5-1440.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"minutes\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "7a3ec5c4-5a3b-5e1b-8b57-8d92c4d508b5",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/auto-rotate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "auto-rotate"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"minutes\": 30\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

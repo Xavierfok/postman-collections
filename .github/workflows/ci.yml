@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install jsonschema requests
+      - name: generated files match build.py
+        run: python build.py --check
+      - name: schema, credentials, docs
+        run: python ci/lint.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install -g newman@6
+      - name: run every request against a local mock
+        run: |
+          python ci/mock_server.py 8787 &
+          sleep 1
+          for c in collections/*.json; do
+            echo "== $c"
+            newman run "$c" --env-var baseUrl=http://127.0.0.1:8787/api --bail
+          done

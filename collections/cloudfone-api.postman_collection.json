@@ -1,0 +1,1097 @@
+{
+  "info": {
+    "_postman_id": "b10b897d-96dd-5eb7-a0ca-0bc4d99f83cc",
+    "name": "cloudf.one - Cloud Phone API",
+    "description": "REST API for [cloudf.one](https://cloudf.one/?utm_source=postman&utm_medium=collection): real Android phones in Singapore on Singtel or M1 SIMs, rented by the day, week or month.\n\nThe phone panel runs DeviceFarmer STF 2.4.1 and this is its API, scoped to the phones on your account. This collection covers the endpoints we support; the full STF spec is at https://cloudf.one/api/v1/swagger.json, but its admin endpoints (groups, users, bookings) are restricted.\n\n**Auth:** log in, open your phone once, then go to cloudf.one/#!/settings > Access tokens and generate one. Set it as `accessToken`; it's sent as `Authorization: Bearer`. Tokens don't expire on a timer.\n\n**What the API doesn't do:** adb over the internet (the remoteConnect port isn't reachable from outside; a WireGuard tunnel is available on request), input injection or screenshots over REST (that's STF's websocket protocol), APK install (web UI or tunnelled adb), or credit top-ups (web only). No published rate limit; polling /devices every few seconds is fine.\n\nHuman docs: https://cloudf.one/developers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('response is JSON', function () {",
+          "    pm.response.to.have.jsonBody();",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://cloudf.one/api/v1",
+      "type": "string",
+      "description": "API root"
+    },
+    {
+      "key": "serial",
+      "value": "",
+      "type": "string",
+      "description": "A device serial from GET /devices"
+    },
+    {
+      "key": "tokenId",
+      "value": "",
+      "type": "string",
+      "description": "An access token id"
+    }
+  ],
+  "item": [
+    {
+      "name": "Account",
+      "description": "Token healthcheck and token management.",
+      "item": [
+        {
+          "id": "ff8da5a4-952f-5b06-af83-f121775a9339",
+          "name": "My account",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "Email, name, privilege and group. Cheapest way to check a token works."
+          },
+          "response": [
+            {
+              "id": "d468c4c2-1235-5153-9738-5673e6d801b9",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Getting user info\",\n  \"user\": {\n    \"email\": \"you@example.com\",\n    \"name\": \"you\",\n    \"privilege\": \"user\",\n    \"group\": \"a1b2c3d4...\",\n    \"settings\": {}\n  }\n}"
+            },
+            {
+              "id": "3b1b73e7-1751-5846-803d-a8c0bfafbab5",
+              "name": "401 missing or bad token",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"description\": \"Bad Credentials\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "3b299c61-3b27-55b0-87c3-0c9805bb9e5c",
+          "name": "List access tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/accessTokens",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "accessTokens"
+              ]
+            },
+            "description": "Names of your tokens (not their values)."
+          },
+          "response": [
+            {
+              "id": "6d82693f-6c2f-54c9-aac9-0f81b8ad80ea",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user/accessTokens",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "accessTokens"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Getting access tokens info\",\n  \"tokens\": [\n    \"ci\",\n    \"laptop\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "id": "65849ad2-4c03-5def-9223-142a1511c744",
+          "name": "Create access token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/accessTokens?title=ci",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "accessTokens"
+              ],
+              "query": [
+                {
+                  "key": "title",
+                  "value": "ci",
+                  "description": "Label for the token"
+                }
+              ]
+            },
+            "description": "Mints another token with the given `title`. You need one token first; the very first one is made in the web UI at cloudf.one/#!/settings."
+          },
+          "response": [
+            {
+              "id": "740b6e70-9ea6-5fc8-8fd6-a80e5979798b",
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user/accessTokens?title=ci",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "accessTokens"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "ci",
+                      "description": "Label for the token"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Created (access token)\",\n  \"token\": {\n    \"id\": \"<new token id>\",\n    \"title\": \"ci\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "6726b603-cc02-51d7-971f-deee1efdf2da",
+          "name": "Revoke access token",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/accessTokens/:tokenId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "accessTokens",
+                ":tokenId"
+              ],
+              "variable": [
+                {
+                  "key": "tokenId",
+                  "value": "{{tokenId}}",
+                  "description": "Token id"
+                }
+              ]
+            },
+            "description": "Revokes one token. It stops working immediately."
+          },
+          "response": [
+            {
+              "id": "f19c19a7-731d-5889-bbb2-5d925d3f2c5a",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user/accessTokens/:tokenId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "accessTokens",
+                    ":tokenId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "tokenId",
+                      "value": "{{tokenId}}",
+                      "description": "Token id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Deleted (access token)\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "c3832be6-cdaf-58f7-9da4-aa68925ba1ca",
+          "name": "Register adb public key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/adbPublicKeys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "adbPublicKeys"
+              ]
+            },
+            "description": "Registers an adb public key (`~/.android/adbkey.pub`) on your account. Accepted today, but adb is **not reachable over the internet**; see the collection description.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"publickey\": \"QAAAAM... user@host\",\n  \"title\": \"laptop\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "eb932d64-3dff-54ce-a35a-d311de039550",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/user/adbPublicKeys",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "adbPublicKeys"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"publickey\": \"QAAAAM... user@host\",\n  \"title\": \"laptop\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Devices",
+      "description": "Your phones. `GET /devices` is scoped to the phones on your account and returns an empty list, not an error, if your subscription has lapsed.",
+      "item": [
+        {
+          "id": "a3acc984-a20f-5e03-a70f-6e37772018f1",
+          "name": "List my phones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "devices"
+              ]
+            },
+            "description": "The phones on your account: model, carrier (`operator`), Android version, battery, and whether each is present and ready."
+          },
+          "response": [
+            {
+              "id": "80309c49-61c9-5083-bed3-69a4b7371cf6",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Getting devices info\",\n  \"devices\": [\n    {\n      \"serial\": \"R58N12ABCDE\",\n      \"present\": true,\n      \"ready\": true,\n      \"using\": false,\n      \"owner\": null,\n      \"manufacturer\": \"SAMSUNG\",\n      \"model\": \"SM-G981B\",\n      \"marketName\": \"Galaxy S20 5G\",\n      \"operator\": \"Singtel\",\n      \"version\": \"13\",\n      \"sdk\": \"33\",\n      \"abi\": \"arm64-v8a\",\n      \"battery\": {\n        \"level\": 80,\n        \"status\": \"not_charging\",\n        \"health\": \"good\",\n        \"temp\": 31.0\n      },\n      \"network\": {\n        \"connected\": true,\n        \"type\": \"MOBILE\",\n        \"subtype\": \"LTE\"\n      },\n      \"display\": {\n        \"width\": 1080,\n        \"height\": 2400\n      }\n    }\n  ]\n}"
+            },
+            {
+              "id": "fe2017c3-b261-5cc6-ab8a-6491b0672f01",
+              "name": "401 missing or bad token",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"devices\": []\n}"
+            }
+          ]
+        },
+        {
+          "id": "273b99c5-ca4d-57b0-b672-579053f8eb01",
+          "name": "Get one phone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices/:serial",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "devices",
+                ":serial"
+              ],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "serial,model,operator,present,ready,battery",
+                  "description": "Optional comma-separated field list",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "serial",
+                  "value": "{{serial}}",
+                  "description": "Device serial from GET /devices"
+                }
+              ]
+            },
+            "description": "One device in full detail."
+          },
+          "response": [
+            {
+              "id": "fa79dd7a-9a32-59e8-8692-8186cd2b72e7",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial"
+                  ],
+                  "query": [
+                    {
+                      "key": "fields",
+                      "value": "serial,model,operator,present,ready,battery",
+                      "description": "Optional comma-separated field list",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Getting device info\",\n  \"device\": {\n    \"serial\": \"R58N12ABCDE\",\n    \"present\": true,\n    \"ready\": true,\n    \"using\": false,\n    \"owner\": null,\n    \"manufacturer\": \"SAMSUNG\",\n    \"model\": \"SM-G981B\",\n    \"marketName\": \"Galaxy S20 5G\",\n    \"operator\": \"Singtel\",\n    \"version\": \"13\",\n    \"sdk\": \"33\",\n    \"abi\": \"arm64-v8a\",\n    \"battery\": {\n      \"level\": 80,\n      \"status\": \"not_charging\",\n      \"health\": \"good\",\n      \"temp\": 31.0\n    },\n    \"network\": {\n      \"connected\": true,\n      \"type\": \"MOBILE\",\n      \"subtype\": \"LTE\"\n    },\n    \"display\": {\n      \"width\": 1080,\n      \"height\": 2400\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "8f63143e-dde9-59f8-8023-4a6ce9c00ee0",
+          "name": "Phones I hold the lock on",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "devices"
+              ]
+            },
+            "description": "Devices you currently hold the control lock on."
+          },
+          "response": [
+            {
+              "id": "4213f20c-454a-59aa-a147-a7ae010ea995",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user/devices",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "devices"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Getting user devices info\",\n  \"devices\": [\n    {\n      \"serial\": \"R58N12ABCDE\",\n      \"present\": true,\n      \"ready\": true,\n      \"using\": true,\n      \"owner\": null,\n      \"manufacturer\": \"SAMSUNG\",\n      \"model\": \"SM-G981B\",\n      \"marketName\": \"Galaxy S20 5G\",\n      \"operator\": \"Singtel\",\n      \"version\": \"13\",\n      \"sdk\": \"33\",\n      \"abi\": \"arm64-v8a\",\n      \"battery\": {\n        \"level\": 80,\n        \"status\": \"not_charging\",\n        \"health\": \"good\",\n        \"temp\": 31.0\n      },\n      \"network\": {\n        \"connected\": true,\n        \"type\": \"MOBILE\",\n        \"subtype\": \"LTE\"\n      },\n      \"display\": {\n        \"width\": 1080,\n        \"height\": 2400\n      }\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "id": "c29ebc96-1a71-597b-b582-3d5c9cd60dc4",
+          "name": "Take control lock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "devices"
+              ]
+            },
+            "description": "Takes the control lock on a device, like opening it in the browser does. Opening the same phone in a tab at the same time fights over the same lock. `timeout` is idle ms before release.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serial\": \"{{serial}}\",\n  \"timeout\": 900000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "537f0388-d2ce-58a9-b9c3-bca6539342f3",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/user/devices",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "devices"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"serial\": \"{{serial}}\",\n  \"timeout\": 900000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Requested\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "3de232e4-eb65-5d6e-bddf-d59503ab7bc1",
+          "name": "Release control lock",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/devices/:serial",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "devices",
+                ":serial"
+              ],
+              "variable": [
+                {
+                  "key": "serial",
+                  "value": "{{serial}}",
+                  "description": "Device serial from GET /devices"
+                }
+              ]
+            },
+            "description": "Releases the lock."
+          },
+          "response": [
+            {
+              "id": "836b81e6-619e-545c-9be4-7a423c751b87",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/user/devices/:serial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "user",
+                    "devices",
+                    ":serial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"description\": \"Requested\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Partner orders (partner key, charges credit)",
+      "description": "For partner accounts only, with a partner key we issue on request (separate from your access token). Orders spend a prepaid credit balance; top-ups are web-only. Set `partnerKey` in the environment.",
+      "item": [
+        {
+          "id": "79b06616-ebd9-5bb9-bffe-4d1e481ab499",
+          "name": "Stock and prices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/stock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "stock"
+              ]
+            },
+            "description": "Free phones per carrier and the price per duration. Read-only."
+          },
+          "response": [
+            {
+              "id": "357f25d7-7d74-5b81-ab88-d36b4aa2078d",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/stock",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "stock"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"available\": {\n    \"singtel\": 3,\n    \"m1\": 2,\n    \"total\": 5\n  },\n  \"prices\": {\n    \"1\": 5.0,\n    \"7\": 16.67,\n    \"30\": 50.0\n  },\n  \"max_devices_per_order\": 5\n}"
+            },
+            {
+              "id": "993c3542-5df1-58a0-8a24-70b2e1f15c0a",
+              "name": "401 bad partner key",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/stock",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "stock"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"unauthorized\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "0d9ae0d9-56b2-5e0f-a05b-edb46b732d78",
+          "name": "Order or renew phones (charges credit)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Unique per order; reuse it only to retry the same order"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "**Spends credit.** `duration_days`: 1, 7 or 30. `quantity`: the TOTAL number of phones you want to hold (1-5), not an increment; ordering the number you already hold renews them. `carrier`: optional, `singtel` or `m1`.\n\n`Idempotency-Key` is required: retrying with the same key replays the original order instead of buying again. Strict: 409 with the real available count if the pool can't fill it, 402 with your balance and the price if credit won't cover it. Nothing is charged in either case.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duration_days\": 30,\n  \"quantity\": 2,\n  \"carrier\": \"singtel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cc22e356-03df-514d-932c-121e871b04f7",
+              "name": "201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{$guid}}",
+                    "description": "Unique per order; reuse it only to retry the same order"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"duration_days\": 30,\n  \"quantity\": 2,\n  \"carrier\": \"singtel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"order_id\": \"api-...\",\n  \"replayed\": false,\n  \"duration_days\": 30,\n  \"expires_at\": \"2026-10-23T10:00:00+00:00\",\n  \"devices\": [\n    {\n      \"serial\": \"R58N12ABCDE\",\n      \"carrier\": \"singtel\"\n    },\n    {\n      \"serial\": \"R58N12FGHIJ\",\n      \"carrier\": \"singtel\"\n    }\n  ],\n  \"pending\": 0,\n  \"balance_after\": 100.0,\n  \"charged\": 100.0\n}"
+            },
+            {
+              "id": "e900c794-9598-5d39-be47-16c41970cabd",
+              "name": "409 not enough stock",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{$guid}}",
+                    "description": "Unique per order; reuse it only to retry the same order"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"duration_days\": 30,\n  \"quantity\": 2,\n  \"carrier\": \"singtel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"insufficient_stock\",\n  \"available\": 1,\n  \"requested\": 2\n}"
+            },
+            {
+              "id": "c4de0dc2-63a2-52ea-9b11-12c7a2f17156",
+              "name": "402 not enough credit",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{$guid}}",
+                    "description": "Unique per order; reuse it only to retry the same order"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"duration_days\": 30,\n  \"quantity\": 2,\n  \"carrier\": \"singtel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Payment Required",
+              "code": 402,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"insufficient_credit\",\n  \"balance\": 20.0,\n  \"price\": 100.0\n}"
+            },
+            {
+              "id": "bd71a7fd-e1a0-51bc-ba99-5afcf402e197",
+              "name": "400 missing Idempotency-Key",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{$guid}}",
+                    "description": "Unique per order; reuse it only to retry the same order"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"duration_days\": 30,\n  \"quantity\": 2,\n  \"carrier\": \"singtel\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": \"missing_idempotency_key\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "6aee1f4a-1039-5b42-802a-c9619f8d682f",
+          "name": "My API orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Your API orders, newest first, with what each was charged. Web purchases and top-ups are not listed here."
+          },
+          "response": [
+            {
+              "id": "fcc6020c-7a8b-5464-bea4-d1441c5458d7",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"orders\": [\n    {\n      \"order_id\": \"api-...\",\n      \"charged\": 100.0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"note\": \"api order\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{partnerKey}}",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
