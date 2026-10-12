@@ -5,8 +5,8 @@ Ready-to-import [Postman](https://www.postman.com/) collections for three APIs:
 | Collection | What it's for | Requests |
 |---|---|---|
 | [Singapore Mobile Proxy - Customer API](collections/singapore-mobile-proxy-customer-api.postman_collection.json) | Buy, renew, rotate and manage dedicated Singapore mobile proxies (Singtel or M1 SIMs) | 12 |
-| [Singapore Mobile Proxy - Reseller API](collections/singapore-mobile-proxy-reseller-api.postman_collection.json) | Create and manage proxies for your own customers at reseller pricing | 15 |
-| [cloudf.one - Cloud Phone API](collections/cloudfone-api.postman_collection.json) | List and lock the real Android phones on your cloudf.one account, plus partner ordering | 13 |
+| [Singapore Mobile Proxy - Reseller API](collections/singapore-mobile-proxy-reseller-api.postman_collection.json) | Create and manage proxies for your own customers at reseller pricing, including modem trials | 23 |
+| [cloudf.one - Cloud Phone API](collections/cloudfone-api.postman_collection.json) | List and lock the real Android phones on your cloudf.one account, install APKs, plus partner ordering | 14 |
 
 Every request has a description and saved example responses, including the error cases worth handling
 (402 over credit, 409 out of stock, 429 cooldown).
@@ -43,7 +43,8 @@ Running the whole collection with a real key will run these. Use `--folder` to p
 ## What the APIs don't do
 
 - **cloudf.one:** no adb over the internet (a WireGuard tunnel is available on request), no input injection or
-  screenshots over REST, no APK install, no credit top-ups over the API. Details on
+  screenshots over REST, no credit top-ups over the API. APK install does work over REST
+  (`POST /devices/{serial}/install`, in the Devices folder). Details on
   [cloudf.one/developers](https://cloudf.one/developers?utm_source=github&utm_medium=repo).
 - **Singapore Mobile Proxy:** proxies are Singtel or M1. The customer API picks the carrier for you; the reseller API
   takes `telco`.

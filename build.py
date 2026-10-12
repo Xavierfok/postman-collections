@@ -50,7 +50,7 @@ def _url(path, query=None, path_vars=None):
     return url
 
 
-def request(coll, name, method, path, desc, *, body=None, query=None, path_vars=None,
+def request(coll, name, method, path, desc, *, body=None, form=None, query=None, path_vars=None,
             headers=None, examples=(), auth=None):
     req = {
         "method": method,
@@ -62,6 +62,10 @@ def request(coll, name, method, path, desc, *, body=None, query=None, path_vars=
         req["header"].append({"key": "Content-Type", "value": "application/json"})
         req["body"] = {"mode": "raw", "raw": json.dumps(body, indent=2),
                        "options": {"raw": {"language": "json"}}}
+    if form is not None:
+        # multipart file fields; pick the file in Postman (src stays empty in the repo)
+        req["body"] = {"mode": "formdata", "formdata": [
+            {"key": k, "type": "file", "src": [], "description": d} for k, d in form]}
     if auth is not None:
         req["auth"] = auth
     item = {"id": _id(coll, name), "name": name, "request": req, "response": []}
@@ -271,6 +275,16 @@ def smp_customer():
 
 # ---------------------------------------------------------- SMP reseller API
 
+# verbatim from the server's swap-trial messages
+TRIAL_MESSAGES = {
+    "trial_open": "This port already has a trial running. Keep it or go back first.",
+    "cooldown": "This port was swapped recently. Try again later.",
+    "start_failed": "The new modem didn't pass traffic, so you're still on your original modem.",
+    "attempt_limit": "This trial has tried as many modems as it can. Keep the current one or go back.",
+    "not_extendable": "This trial can't be extended.",
+    "go_back_unavailable": "Your original modem isn't available any more.",
+}
+
 def smp_reseller():
     c = "smp-reseller"
     port = {
@@ -295,6 +309,7 @@ def smp_reseller():
         "end_date": "2026-09-30",
         "removed_at": "2026-10-01T00:05:00+08:00",
         "cancelled_at": None,
+        "swap_trial": None,
     }
     pid = [("portId", "{{portId}}", "Port id from GET /ports")]
 
@@ -382,6 +397,95 @@ def smp_reseller():
                  body={"minutes": 30}),
     ])
 
+    trial = {
+        "id": "9d1c2b3a-...",
+        "status": "active",
+        "started_via": "api",
+        "on_timeout": "keep",
+        "modem": {"modem_id": "m_1a2b3c4d5e", "carrier": "m1", "model": "M300z", "tag": "482",
+                  "network": "5G", "server_id": "b7e1..."},
+        "credentials_change": False,
+        "new_proxy": None,
+        "attempts": 1,
+        "started_at": "2026-10-12T10:00:00+00:00",
+        "expires_at": "2026-10-12T10:10:00+00:00",
+        "seconds_left": 600,
+        "extended": False,
+        "can_extend": True,
+        "ended_at": None,
+        "outcome": None,
+        "can_go_back": False,
+        "went_back": False,
+    }
+    kept = {**trial, "status": "kept", "expires_at": None, "seconds_left": 0, "can_extend": False,
+            "ended_at": "2026-10-12T10:04:00+00:00", "can_go_back": True}
+    reverted = {**trial, "status": "reverted", "expires_at": None, "seconds_left": 0, "can_extend": False,
+                "ended_at": "2026-10-12T10:04:00+00:00"}
+
+    def with_port(t):
+        return {"trial": t, "port": {**port, "swap_trial": t}}
+
+    def trial_err(status, phrase, code, extra=None):
+        return (f"{status} {code}", status, phrase,
+                {"detail": {"message": TRIAL_MESSAGES[code], "code": code, **(extra or {})}})
+
+    no_open = ("409 no_open_trial", 409, "Conflict",
+               {"detail": {"message": "This port has no trial to act on.", "code": "no_open_trial"}})
+    trials = folder("Modem trials", "Move a port to another modem for 10 minutes, then keep it or go back. "
+                                    "Built for a customer who says their line is slow. A trial on the same server "
+                                    "never changes host, port or login; one on another server does "
+                                    "(`credentials_change: true`, test with `new_proxy` until you keep it). "
+                                    "Errors carry `detail.code`.", [
+        request(c, "Swap options", "GET", "ports/:portId/swap-options",
+                "Every free modem this port could move to, by server: carrier, model, 4G/5G, signal, last measured "
+                "speed and today's speed-test pass count. Pass a card's `modem_id` to start a trial.",
+                path_vars=pid,
+                examples=[("200 OK", 200, "OK", {
+                    "current": {"server_id": "b7e1...", "server_name": "Server 3", "model": "E3372", "tag": "917",
+                                "network": "4G", "telco": "singtel", "telco_label": "Singtel"},
+                    "cross_server_enabled": True,
+                    "servers": [{"server_id": "b7e1...", "name": "Server 3", "is_current": True, "unavailable": False,
+                                 "modems": [{"modem_id": "m_1a2b3c4d5e", "server_id": "b7e1...", "telco": "m1",
+                                             "telco_label": "M1", "model": "M300z", "tag": "482", "network": "5G",
+                                             "signal": 4, "down_mbps": 182.4, "up_mbps": 31.2, "latency_ms": 28,
+                                             "tested_at": "2026-10-12T08:00:00+00:00", "tests_ok_24h": 6,
+                                             "tests_total_24h": 6}]}],
+                    "trial": None, "trial_minutes": 10, "extend_minutes": 10, "go_back_minutes": 60})]),
+        port_req("Start a trial", "swap-trial",
+                 "Moves the port onto another modem for 10 minutes. Send `modem_id` from swap-options, or "
+                 "`telco` (`singtel` or `m1`) and/or `server_id` to let us pick. `on_timeout`: `keep` (default) "
+                 "or `revert`, what happens if you do nothing.",
+                 body={"modem_id": "m_1a2b3c4d5e", "on_timeout": "keep"},
+                 examples=[("200 OK", 200, "OK", with_port(trial)),
+                           trial_err(409, "Conflict", "trial_open"),
+                           trial_err(429, "Too Many Requests", "cooldown",
+                                     {"available_at": "2026-10-12T10:30:00+00:00"}),
+                           trial_err(503, "Service Unavailable", "start_failed")]),
+        request(c, "Current trial", "GET", "ports/:portId/swap-trial",
+                "The port's open trial, or one that ended in the last hour.",
+                path_vars=pid,
+                examples=[("200 OK", 200, "OK", {"trial": trial}),
+                          ("404 no_recent_trial", 404, "Not Found", {"detail": {
+                              "message": "This port has no trial in the last hour.", "code": "no_recent_trial"}})]),
+        port_req("Keep the new modem", "swap-trial/keep", "Ends the trial on the new modem.",
+                 examples=[("200 OK", 200, "OK", with_port(kept)), no_open]),
+        port_req("Revert to the original modem", "swap-trial/revert", "Ends the trial back on the original modem.",
+                 examples=[("200 OK", 200, "OK", with_port(reverted)), no_open]),
+        port_req("Try another modem", "swap-trial/next",
+                 "Stays in the same trial and moves to another modem. Same body as starting one.",
+                 body={"modem_id": "m_6f7e8d9c0b"},
+                 examples=[("200 OK", 200, "OK", with_port({**trial, "attempts": 2})), no_open,
+                           trial_err(429, "Too Many Requests", "attempt_limit")]),
+        port_req("Extend by 10 minutes", "swap-trial/extend", "Once per trial.",
+                 examples=[("200 OK", 200, "OK", with_port({**trial, "extended": True, "can_extend": False,
+                                                           "seconds_left": 1080})),
+                           trial_err(409, "Conflict", "not_extendable")]),
+        port_req("Go back after keeping", "swap-trial/go-back",
+                 "Undoes a same-server keep within an hour, if the original modem is still free.",
+                 examples=[("200 OK", 200, "OK", with_port({**kept, "can_go_back": False, "went_back": True})),
+                           trial_err(409, "Conflict", "go_back_unavailable")]),
+    ])
+
     desc = (
         "Reseller API for [Singapore Mobile Proxy]"
         f"({SMP_SITE}/?{UTM}): create and manage dedicated Singapore mobile proxies (Singtel or M1) for your own "
@@ -391,7 +495,8 @@ def smp_reseller():
         "**Billing:** no deposit. Each port bills its daily cost against your monthly credit limit ($500 by default) "
         "and you're invoiced monthly.\n\n"
         "**Errors:** `{\"detail\": {\"message\": \"...\"}}`. 400 bad parameter, 401 bad key, 402 past your credit "
-        "limit, 403 not a reseller key / account inactive, 404 no such port, 409 port cancelled, 429 too fast "
+        "limit, 403 not a reseller key / account inactive, 404 no such port, 409 port cancelled or a trial "
+        "conflict (see `detail.code`), 429 too fast "
         "(120 requests a minute, 30 new ports an hour, 5 minutes between rotations or reboots of a port), "
         "502 the proxy server refused (nothing changed), 503 no free modem (nothing created or billed).\n\n"
         f"Human docs: {SMP_SITE}/reseller-api-docs"
@@ -399,7 +504,7 @@ def smp_reseller():
     return collection(c, "Singapore Mobile Proxy - Reseller API", desc, APIKEY_AUTH, [
         ("baseUrl", f"{SMP_SITE}/api/reseller/v1", "API root"),
         ("portId", "", "A port id from GET /ports"),
-    ], [account, ports, manage])
+    ], [account, ports, manage, trials])
 
 
 # ------------------------------------------------------------ cloudf.one API
@@ -465,6 +570,26 @@ def cloudfone():
         request(c, "Release control lock", "DELETE", "user/devices/:serial", "Releases the lock.",
                 path_vars=serial_var,
                 examples=[("200 OK", 200, "OK", {"success": True, "description": "Requested"})]),
+        request(c, "Install an APK", "POST", "devices/:serial/install",
+                "Uploads an app and installs it on one of your phones. Multipart field `file`: a .apk, or a split "
+                "bundle (.apks, .xapk, or a zip of apks; OBB data in an .xapk is skipped). Pick the file in the "
+                "body tab.\n\n"
+                "Installs over an existing copy, never downgrades, and doesn't pre-grant permissions. Answers once "
+                "Android has installed it. Up to 512 MB, one install per phone at a time, 30 an hour per account. "
+                "On failure `detail` carries Android's own reason (e.g. INSTALL_FAILED_UPDATE_INCOMPATIBLE).",
+                form=[("file", "The .apk, .apks or .xapk to install")],
+                path_vars=serial_var,
+                examples=[("200 OK", 200, "OK", {"success": True, "serial": serial, "package": "com.example.app",
+                                                 "kind": "apk", "files": 1}),
+                          ("404 not your phone", 404, "Not Found", {"success": False, "error": "not_found",
+                                                                    "detail": "no such device on this account"}),
+                          ("409 install already running", 409, "Conflict", {
+                              "success": False, "error": "install_in_progress",
+                              "detail": "another install is running on this phone"}),
+                          ("413 over 512 MB", 413, "Content Too Large", {"success": False, "error": "too_large",
+                                                                       "detail": "uploads are capped at 512 MB"}),
+                          ("429 over 30 an hour", 429, "Too Many Requests", {
+                              "success": False, "error": "rate_limited", "detail": "at most 30 installs per hour"})]),
     ])
 
     partner = folder(
@@ -521,7 +646,8 @@ def cloudfone():
         "Set it as `accessToken`; it's sent as `Authorization: Bearer`. Tokens don't expire on a timer.\n\n"
         "**What the API doesn't do:** adb over the internet (the remoteConnect port isn't reachable from outside; "
         "a WireGuard tunnel is available on request), input injection or screenshots over REST (that's STF's "
-        "websocket protocol), APK install (web UI or tunnelled adb), or credit top-ups (web only). "
+        "websocket protocol), or credit top-ups (web only). APK install does work over REST: "
+        "`POST /devices/{serial}/install` in the Devices folder. "
         "No published rate limit; polling /devices every few seconds is fine.\n\n"
         f"Human docs: {CF_SITE}/developers"
     )

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b10b897d-96dd-5eb7-a0ca-0bc4d99f83cc",
     "name": "cloudf.one - Cloud Phone API",
-    "description": "REST API for [cloudf.one](https://cloudf.one/?utm_source=postman&utm_medium=collection): real Android phones in Singapore on Singtel or M1 SIMs, rented by the day, week or month.\n\nThe phone panel runs DeviceFarmer STF 2.4.1 and this is its API, scoped to the phones on your account. This collection covers the endpoints we support; the full STF spec is at https://cloudf.one/api/v1/swagger.json, but its admin endpoints (groups, users, bookings) are restricted.\n\n**Auth:** log in, open your phone once, then go to cloudf.one/#!/settings > Access tokens and generate one. Set it as `accessToken`; it's sent as `Authorization: Bearer`. Tokens don't expire on a timer.\n\n**What the API doesn't do:** adb over the internet (the remoteConnect port isn't reachable from outside; a WireGuard tunnel is available on request), input injection or screenshots over REST (that's STF's websocket protocol), APK install (web UI or tunnelled adb), or credit top-ups (web only). No published rate limit; polling /devices every few seconds is fine.\n\nHuman docs: https://cloudf.one/developers",
+    "description": "REST API for [cloudf.one](https://cloudf.one/?utm_source=postman&utm_medium=collection): real Android phones in Singapore on Singtel or M1 SIMs, rented by the day, week or month.\n\nThe phone panel runs DeviceFarmer STF 2.4.1 and this is its API, scoped to the phones on your account. This collection covers the endpoints we support; the full STF spec is at https://cloudf.one/api/v1/swagger.json, but its admin endpoints (groups, users, bookings) are restricted.\n\n**Auth:** log in, open your phone once, then go to cloudf.one/#!/settings > Access tokens and generate one. Set it as `accessToken`; it's sent as `Authorization: Bearer`. Tokens don't expire on a timer.\n\n**What the API doesn't do:** adb over the internet (the remoteConnect port isn't reachable from outside; a WireGuard tunnel is available on request), input injection or screenshots over REST (that's STF's websocket protocol), or credit top-ups (web only). APK install does work over REST: `POST /devices/{serial}/install` in the Devices folder. No published rate limit; polling /devices every few seconds is fine.\n\nHuman docs: https://cloudf.one/developers",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -728,6 +728,281 @@
                 }
               ],
               "body": "{\n  \"success\": true,\n  \"description\": \"Requested\"\n}"
+            }
+          ]
+        },
+        {
+          "id": "ceee98e0-1442-5e6e-91ea-b1cca06c001f",
+          "name": "Install an APK",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices/:serial/install",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "devices",
+                ":serial",
+                "install"
+              ],
+              "variable": [
+                {
+                  "key": "serial",
+                  "value": "{{serial}}",
+                  "description": "Device serial from GET /devices"
+                }
+              ]
+            },
+            "description": "Uploads an app and installs it on one of your phones. Multipart field `file`: a .apk, or a split bundle (.apks, .xapk, or a zip of apks; OBB data in an .xapk is skipped). Pick the file in the body tab.\n\nInstalls over an existing copy, never downgrades, and doesn't pre-grant permissions. Answers once Android has installed it. Up to 512 MB, one install per phone at a time, 30 an hour per account. On failure `detail` carries Android's own reason (e.g. INSTALL_FAILED_UPDATE_INCOMPATIBLE).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "description": "The .apk, .apks or .xapk to install"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "4fda7908-42e2-5b7a-91f2-3c4b0922db88",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial/install",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial",
+                    "install"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [],
+                      "description": "The .apk, .apks or .xapk to install"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"serial\": \"R58N12ABCDE\",\n  \"package\": \"com.example.app\",\n  \"kind\": \"apk\",\n  \"files\": 1\n}"
+            },
+            {
+              "id": "e65e4051-88ca-588f-94c1-59bff4f8bd33",
+              "name": "404 not your phone",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial/install",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial",
+                    "install"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [],
+                      "description": "The .apk, .apks or .xapk to install"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"not_found\",\n  \"detail\": \"no such device on this account\"\n}"
+            },
+            {
+              "id": "d5efd8a1-858e-5375-b0a3-2471fb0d32cc",
+              "name": "409 install already running",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial/install",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial",
+                    "install"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [],
+                      "description": "The .apk, .apks or .xapk to install"
+                    }
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"install_in_progress\",\n  \"detail\": \"another install is running on this phone\"\n}"
+            },
+            {
+              "id": "77198a9c-0303-5c9a-82a7-2caacdc3fcbf",
+              "name": "413 over 512 MB",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial/install",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial",
+                    "install"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [],
+                      "description": "The .apk, .apks or .xapk to install"
+                    }
+                  ]
+                }
+              },
+              "status": "Content Too Large",
+              "code": 413,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"too_large\",\n  \"detail\": \"uploads are capped at 512 MB\"\n}"
+            },
+            {
+              "id": "c3f1e9fe-ecfe-50ef-84a4-19d2d2584e17",
+              "name": "429 over 30 an hour",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/devices/:serial/install",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "devices",
+                    ":serial",
+                    "install"
+                  ],
+                  "variable": [
+                    {
+                      "key": "serial",
+                      "value": "{{serial}}",
+                      "description": "Device serial from GET /devices"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [],
+                      "description": "The .apk, .apks or .xapk to install"
+                    }
+                  ]
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": false,\n  \"error\": \"rate_limited\",\n  \"detail\": \"at most 30 installs per hour\"\n}"
             }
           ]
         }

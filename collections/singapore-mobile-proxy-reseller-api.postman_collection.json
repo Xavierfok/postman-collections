@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6babfc0f-112b-530a-bda4-f827b4ebe81a",
     "name": "Singapore Mobile Proxy - Reseller API",
-    "description": "Reseller API for [Singapore Mobile Proxy](https://singaporemobileproxy.com/?utm_source=postman&utm_medium=collection): create and manage dedicated Singapore mobile proxies (Singtel or M1) for your own customers, at your reseller price.\n\n**Auth:** make a key in the reseller dashboard (`/shop/api-keys`), set `apiKey` in the environment. Sent as `x-api-key`. Customer keys are refused here, and reseller keys on the customer API.\n\n**Billing:** no deposit. Each port bills its daily cost against your monthly credit limit ($500 by default) and you're invoiced monthly.\n\n**Errors:** `{\"detail\": {\"message\": \"...\"}}`. 400 bad parameter, 401 bad key, 402 past your credit limit, 403 not a reseller key / account inactive, 404 no such port, 409 port cancelled, 429 too fast (120 requests a minute, 30 new ports an hour, 5 minutes between rotations or reboots of a port), 502 the proxy server refused (nothing changed), 503 no free modem (nothing created or billed).\n\nHuman docs: https://singaporemobileproxy.com/reseller-api-docs",
+    "description": "Reseller API for [Singapore Mobile Proxy](https://singaporemobileproxy.com/?utm_source=postman&utm_medium=collection): create and manage dedicated Singapore mobile proxies (Singtel or M1) for your own customers, at your reseller price.\n\n**Auth:** make a key in the reseller dashboard (`/shop/api-keys`), set `apiKey` in the environment. Sent as `x-api-key`. Customer keys are refused here, and reseller keys on the customer API.\n\n**Billing:** no deposit. Each port bills its daily cost against your monthly credit limit ($500 by default) and you're invoiced monthly.\n\n**Errors:** `{\"detail\": {\"message\": \"...\"}}`. 400 bad parameter, 401 bad key, 402 past your credit limit, 403 not a reseller key / account inactive, 404 no such port, 409 port cancelled or a trial conflict (see `detail.code`), 429 too fast (120 requests a minute, 30 new ports an hour, 5 minutes between rotations or reboots of a port), 502 the proxy server refused (nothing changed), 503 no free modem (nothing created or billed).\n\nHuman docs: https://singaporemobileproxy.com/reseller-api-docs",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -268,7 +268,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null\n    }\n  ]\n}"
+              "body": "{\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null,\n      \"swap_trial\": null\n    }\n  ]\n}"
             }
           ]
         },
@@ -331,7 +331,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             },
             {
               "id": "60fe4211-af0a-5c23-9ed3-0e71d398ec39",
@@ -441,7 +441,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"message\": \"Created\",\n  \"requested\": 1,\n  \"created\": 1,\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null\n    }\n  ]\n}"
+              "body": "{\n  \"message\": \"Created\",\n  \"requested\": 1,\n  \"created\": 1,\n  \"ports\": [\n    {\n      \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n      \"label\": \"customer 42\",\n      \"status\": \"active\",\n      \"paused\": false,\n      \"plan\": {\n        \"id\": \"626ec4d4-...\",\n        \"name\": \"200GB Plan\",\n        \"bandwidth_gb\": 200\n      },\n      \"host\": \"sg.veerlane.com\",\n      \"http_port\": 8105,\n      \"socks_port\": 5105,\n      \"login\": \"user8105\",\n      \"password\": \"pass8105\",\n      \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n      \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n      \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n      \"bandwidth_limit_gb\": 200.0,\n      \"bandwidth_used_gb\": 0.0,\n      \"daily_cost_usd\": 0.9333,\n      \"auto_rotate_mins\": 0,\n      \"created_at\": \"2026-09-23T10:00:00+00:00\",\n      \"end_date\": \"2026-09-30\",\n      \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n      \"cancelled_at\": null,\n      \"swap_trial\": null\n    }\n  ]\n}"
             },
             {
               "id": "65efcfbf-4980-560d-b347-4fa2caee8a1f",
@@ -588,7 +588,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"cancelled\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": \"2026-09-24T09:00:00+00:00\"\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"cancelled\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": \"2026-09-24T09:00:00+00:00\",\n  \"swap_trial\": null\n}"
             }
           ]
         },
@@ -681,7 +681,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             }
           ]
         }
@@ -910,7 +910,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             }
           ]
         },
@@ -1003,7 +1003,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             }
           ]
         },
@@ -1096,7 +1096,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             }
           ]
         },
@@ -1189,7 +1189,7 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
             }
           ]
         },
@@ -1375,7 +1375,1035 @@
                   "value": "application/json"
                 }
               ],
-              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null\n}"
+              "body": "{\n  \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n  \"label\": \"customer 42\",\n  \"status\": \"active\",\n  \"paused\": false,\n  \"plan\": {\n    \"id\": \"626ec4d4-...\",\n    \"name\": \"200GB Plan\",\n    \"bandwidth_gb\": 200\n  },\n  \"host\": \"sg.veerlane.com\",\n  \"http_port\": 8105,\n  \"socks_port\": 5105,\n  \"login\": \"user8105\",\n  \"password\": \"pass8105\",\n  \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n  \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n  \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n  \"bandwidth_limit_gb\": 200.0,\n  \"bandwidth_used_gb\": 0.0,\n  \"daily_cost_usd\": 0.9333,\n  \"auto_rotate_mins\": 0,\n  \"created_at\": \"2026-09-23T10:00:00+00:00\",\n  \"end_date\": \"2026-09-30\",\n  \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n  \"cancelled_at\": null,\n  \"swap_trial\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Modem trials",
+      "description": "Move a port to another modem for 10 minutes, then keep it or go back. Built for a customer who says their line is slow. A trial on the same server never changes host, port or login; one on another server does (`credentials_change: true`, test with `new_proxy` until you keep it). Errors carry `detail.code`.",
+      "item": [
+        {
+          "id": "21ff2076-cccc-57da-a0e0-807532538bfa",
+          "name": "Swap options",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-options"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Every free modem this port could move to, by server: carrier, model, 4G/5G, signal, last measured speed and today's speed-test pass count. Pass a card's `modem_id` to start a trial."
+          },
+          "response": [
+            {
+              "id": "d3b8b0eb-ef23-5529-81cf-080c52433afd",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-options",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-options"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"current\": {\n    \"server_id\": \"b7e1...\",\n    \"server_name\": \"Server 3\",\n    \"model\": \"E3372\",\n    \"tag\": \"917\",\n    \"network\": \"4G\",\n    \"telco\": \"singtel\",\n    \"telco_label\": \"Singtel\"\n  },\n  \"cross_server_enabled\": true,\n  \"servers\": [\n    {\n      \"server_id\": \"b7e1...\",\n      \"name\": \"Server 3\",\n      \"is_current\": true,\n      \"unavailable\": false,\n      \"modems\": [\n        {\n          \"modem_id\": \"m_1a2b3c4d5e\",\n          \"server_id\": \"b7e1...\",\n          \"telco\": \"m1\",\n          \"telco_label\": \"M1\",\n          \"model\": \"M300z\",\n          \"tag\": \"482\",\n          \"network\": \"5G\",\n          \"signal\": 4,\n          \"down_mbps\": 182.4,\n          \"up_mbps\": 31.2,\n          \"latency_ms\": 28,\n          \"tested_at\": \"2026-10-12T08:00:00+00:00\",\n          \"tests_ok_24h\": 6,\n          \"tests_total_24h\": 6\n        }\n      ]\n    }\n  ],\n  \"trial\": null,\n  \"trial_minutes\": 10,\n  \"extend_minutes\": 10,\n  \"go_back_minutes\": 60\n}"
+            }
+          ]
+        },
+        {
+          "id": "fe3b9643-46b4-5cac-a0b5-3969363e5ec5",
+          "name": "Start a trial",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Moves the port onto another modem for 10 minutes. Send `modem_id` from swap-options, or `telco` (`singtel` or `m1`) and/or `server_id` to let us pick. `on_timeout`: `keep` (default) or `revert`, what happens if you do nothing.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modem_id\": \"m_1a2b3c4d5e\",\n  \"on_timeout\": \"keep\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "95f7ab3e-a611-52c8-94f9-cb1ede33ed5e",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_1a2b3c4d5e\",\n  \"on_timeout\": \"keep\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"active\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n    \"seconds_left\": 600,\n    \"extended\": false,\n    \"can_extend\": true,\n    \"ended_at\": null,\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": false\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"active\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 1,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n      \"seconds_left\": 600,\n      \"extended\": false,\n      \"can_extend\": true,\n      \"ended_at\": null,\n      \"outcome\": null,\n      \"can_go_back\": false,\n      \"went_back\": false\n    }\n  }\n}"
+            },
+            {
+              "id": "23031a94-2a93-5628-a24f-473279b88d65",
+              "name": "409 trial_open",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_1a2b3c4d5e\",\n  \"on_timeout\": \"keep\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port already has a trial running. Keep it or go back first.\",\n    \"code\": \"trial_open\"\n  }\n}"
+            },
+            {
+              "id": "173e07c9-6656-5a2a-91c5-f79215db7fdf",
+              "name": "429 cooldown",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_1a2b3c4d5e\",\n  \"on_timeout\": \"keep\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port was swapped recently. Try again later.\",\n    \"code\": \"cooldown\",\n    \"available_at\": \"2026-10-12T10:30:00+00:00\"\n  }\n}"
+            },
+            {
+              "id": "ccf0dd43-6307-554d-a172-76a180af34aa",
+              "name": "503 start_failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_1a2b3c4d5e\",\n  \"on_timeout\": \"keep\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"The new modem didn't pass traffic, so you're still on your original modem.\",\n    \"code\": \"start_failed\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "2abe2ddf-68a5-5db2-973a-993036951c20",
+          "name": "Current trial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "The port's open trial, or one that ended in the last hour."
+          },
+          "response": [
+            {
+              "id": "ee51979b-0306-5ef1-bcfd-4548184af285",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"active\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n    \"seconds_left\": 600,\n    \"extended\": false,\n    \"can_extend\": true,\n    \"ended_at\": null,\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": false\n  }\n}"
+            },
+            {
+              "id": "346a59b5-616b-5133-90d2-d7c9a1acf801",
+              "name": "404 no_recent_trial",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port has no trial in the last hour.\",\n    \"code\": \"no_recent_trial\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "880165be-2bf5-5e43-8b2a-a8e44564133e",
+          "name": "Keep the new modem",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial/keep",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial",
+                "keep"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Ends the trial on the new modem."
+          },
+          "response": [
+            {
+              "id": "76d59999-26bc-5824-a8b6-4aeecea4269f",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/keep",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "keep"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"kept\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": null,\n    \"seconds_left\": 0,\n    \"extended\": false,\n    \"can_extend\": false,\n    \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n    \"outcome\": null,\n    \"can_go_back\": true,\n    \"went_back\": false\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"kept\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 1,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": null,\n      \"seconds_left\": 0,\n      \"extended\": false,\n      \"can_extend\": false,\n      \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n      \"outcome\": null,\n      \"can_go_back\": true,\n      \"went_back\": false\n    }\n  }\n}"
+            },
+            {
+              "id": "c2acab1b-aa53-5a7e-8ff0-826ff3fb0c7b",
+              "name": "409 no_open_trial",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/keep",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "keep"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port has no trial to act on.\",\n    \"code\": \"no_open_trial\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "b1079361-8b38-5ca6-8f74-ee1a56e9c087",
+          "name": "Revert to the original modem",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial/revert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial",
+                "revert"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Ends the trial back on the original modem."
+          },
+          "response": [
+            {
+              "id": "861bde04-0139-521f-9562-25d22ed05afd",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/revert",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "revert"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"reverted\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": null,\n    \"seconds_left\": 0,\n    \"extended\": false,\n    \"can_extend\": false,\n    \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": false\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"reverted\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 1,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": null,\n      \"seconds_left\": 0,\n      \"extended\": false,\n      \"can_extend\": false,\n      \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n      \"outcome\": null,\n      \"can_go_back\": false,\n      \"went_back\": false\n    }\n  }\n}"
+            },
+            {
+              "id": "d13926a5-d31f-580d-b3df-0e8643a043f0",
+              "name": "409 no_open_trial",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/revert",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "revert"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port has no trial to act on.\",\n    \"code\": \"no_open_trial\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "e2e6e42b-037b-5cfb-921c-481dfc68daab",
+          "name": "Try another modem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial/next",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial",
+                "next"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Stays in the same trial and moves to another modem. Same body as starting one.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modem_id\": \"m_6f7e8d9c0b\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "acc2eac6-3ec6-5083-9d49-ae90decb9857",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/next",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "next"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_6f7e8d9c0b\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"active\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 2,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n    \"seconds_left\": 600,\n    \"extended\": false,\n    \"can_extend\": true,\n    \"ended_at\": null,\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": false\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"active\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 2,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n      \"seconds_left\": 600,\n      \"extended\": false,\n      \"can_extend\": true,\n      \"ended_at\": null,\n      \"outcome\": null,\n      \"can_go_back\": false,\n      \"went_back\": false\n    }\n  }\n}"
+            },
+            {
+              "id": "f1f56127-153e-5a42-9bb9-948a8bf88937",
+              "name": "409 no_open_trial",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/next",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "next"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_6f7e8d9c0b\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This port has no trial to act on.\",\n    \"code\": \"no_open_trial\"\n  }\n}"
+            },
+            {
+              "id": "c12fbc7a-2ee5-5b70-ae5e-0d8dd9c41ec1",
+              "name": "429 attempt_limit",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/next",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "next"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"modem_id\": \"m_6f7e8d9c0b\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This trial has tried as many modems as it can. Keep the current one or go back.\",\n    \"code\": \"attempt_limit\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "46c90da5-0ff6-574f-bea0-bb7f4f6bb1bb",
+          "name": "Extend by 10 minutes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial/extend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial",
+                "extend"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Once per trial."
+          },
+          "response": [
+            {
+              "id": "32fd7c58-6a95-5f9b-b4d7-c0eaba0a1d93",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/extend",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "extend"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"active\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n    \"seconds_left\": 1080,\n    \"extended\": true,\n    \"can_extend\": false,\n    \"ended_at\": null,\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": false\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"active\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 1,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": \"2026-10-12T10:10:00+00:00\",\n      \"seconds_left\": 1080,\n      \"extended\": true,\n      \"can_extend\": false,\n      \"ended_at\": null,\n      \"outcome\": null,\n      \"can_go_back\": false,\n      \"went_back\": false\n    }\n  }\n}"
+            },
+            {
+              "id": "4ae41d07-d151-5563-9676-07ee2cebb118",
+              "name": "409 not_extendable",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/extend",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "extend"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"This trial can't be extended.\",\n    \"code\": \"not_extendable\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "id": "6581abd9-e114-53cb-8793-9523a46047a3",
+          "name": "Go back after keeping",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ports/:portId/swap-trial/go-back",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ports",
+                ":portId",
+                "swap-trial",
+                "go-back"
+              ],
+              "variable": [
+                {
+                  "key": "portId",
+                  "value": "{{portId}}",
+                  "description": "Port id from GET /ports"
+                }
+              ]
+            },
+            "description": "Undoes a same-server keep within an hour, if the original modem is still free."
+          },
+          "response": [
+            {
+              "id": "f962fbc2-d95e-593c-838b-00f2f48d8689",
+              "name": "200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/go-back",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "go-back"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"trial\": {\n    \"id\": \"9d1c2b3a-...\",\n    \"status\": \"kept\",\n    \"started_via\": \"api\",\n    \"on_timeout\": \"keep\",\n    \"modem\": {\n      \"modem_id\": \"m_1a2b3c4d5e\",\n      \"carrier\": \"m1\",\n      \"model\": \"M300z\",\n      \"tag\": \"482\",\n      \"network\": \"5G\",\n      \"server_id\": \"b7e1...\"\n    },\n    \"credentials_change\": false,\n    \"new_proxy\": null,\n    \"attempts\": 1,\n    \"started_at\": \"2026-10-12T10:00:00+00:00\",\n    \"expires_at\": null,\n    \"seconds_left\": 0,\n    \"extended\": false,\n    \"can_extend\": false,\n    \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n    \"outcome\": null,\n    \"can_go_back\": false,\n    \"went_back\": true\n  },\n  \"port\": {\n    \"id\": \"3f2a9c1e-7b4d-4e8a-9c2f-1a6b5d3e8f70\",\n    \"label\": \"customer 42\",\n    \"status\": \"active\",\n    \"paused\": false,\n    \"plan\": {\n      \"id\": \"626ec4d4-...\",\n      \"name\": \"200GB Plan\",\n      \"bandwidth_gb\": 200\n    },\n    \"host\": \"sg.veerlane.com\",\n    \"http_port\": 8105,\n    \"socks_port\": 5105,\n    \"login\": \"user8105\",\n    \"password\": \"pass8105\",\n    \"http\": \"sg.veerlane.com:8105:user8105:pass8105\",\n    \"socks5\": \"sg.veerlane.com:5105:user8105:pass8105\",\n    \"rotation_link\": \"https://sg.veerlane.com/rotate/<token>\",\n    \"bandwidth_limit_gb\": 200.0,\n    \"bandwidth_used_gb\": 0.0,\n    \"daily_cost_usd\": 0.9333,\n    \"auto_rotate_mins\": 0,\n    \"created_at\": \"2026-09-23T10:00:00+00:00\",\n    \"end_date\": \"2026-09-30\",\n    \"removed_at\": \"2026-10-01T00:05:00+08:00\",\n    \"cancelled_at\": null,\n    \"swap_trial\": {\n      \"id\": \"9d1c2b3a-...\",\n      \"status\": \"kept\",\n      \"started_via\": \"api\",\n      \"on_timeout\": \"keep\",\n      \"modem\": {\n        \"modem_id\": \"m_1a2b3c4d5e\",\n        \"carrier\": \"m1\",\n        \"model\": \"M300z\",\n        \"tag\": \"482\",\n        \"network\": \"5G\",\n        \"server_id\": \"b7e1...\"\n      },\n      \"credentials_change\": false,\n      \"new_proxy\": null,\n      \"attempts\": 1,\n      \"started_at\": \"2026-10-12T10:00:00+00:00\",\n      \"expires_at\": null,\n      \"seconds_left\": 0,\n      \"extended\": false,\n      \"can_extend\": false,\n      \"ended_at\": \"2026-10-12T10:04:00+00:00\",\n      \"outcome\": null,\n      \"can_go_back\": false,\n      \"went_back\": true\n    }\n  }\n}"
+            },
+            {
+              "id": "640d7d0c-2a63-5f11-9c1d-f18a433a2b10",
+              "name": "409 go_back_unavailable",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/ports/:portId/swap-trial/go-back",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "ports",
+                    ":portId",
+                    "swap-trial",
+                    "go-back"
+                  ],
+                  "variable": [
+                    {
+                      "key": "portId",
+                      "value": "{{portId}}",
+                      "description": "Port id from GET /ports"
+                    }
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"detail\": {\n    \"message\": \"Your original modem isn't available any more.\",\n    \"code\": \"go_back_unavailable\"\n  }\n}"
             }
           ]
         }
